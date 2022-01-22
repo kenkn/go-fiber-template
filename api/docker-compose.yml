@@ -1,0 +1,49 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - .:/go/src/api
+    command: >
+      sh -c "reflex -s -r '\.go$$' go run main.go"
+    depends_on:
+      - mysql
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: $$$_db
+
+  mysql:
+    image: mysql/mysql-server:5.7.28
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: $$$_db
+      TZ: 'Asia/Tokyo'
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/my.conf:/etc/mysql/conf.d/my.cnf
+      - ./db/sql:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=admin
+      - PMA_PASSWORD=admin
+    links:
+      - mysql
+    ports:
+      - 8888:80
