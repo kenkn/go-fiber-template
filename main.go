@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-fiber-template/moke"
+	"github.com/kenkn/go-fiber-template/moke"
 )
 
 func main() {
